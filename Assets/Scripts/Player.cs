@@ -74,10 +74,10 @@ public class Player : MonoBehaviour
                     // Add point to edge owner
                     foreach (Player player in monopolyManager.GetPlayers)
                     {
-                        if (player.playerColor == currentEdge.edgeColor)
+                        if (player.playerColor == currentEdge.edgeColor && player.playable)
                         {
                             player.currentPoint += currentEdge.edgePoint;
-                            print(player.playerName + " +" + currentEdge.edgePoint + " from " + this.playerName);
+                            print(player.playerName + " point +" + currentEdge.edgePoint + " from " + this.playerName);
                         }
                     }
 
@@ -111,12 +111,12 @@ public class Player : MonoBehaviour
             print(playerName + " Game Over");
             gameObject.SetActive(false);
             playable = false;
-            monopolyManager.playerInGame -= 1;
+            monopolyManager.playerLose.Add(this);
 
             // Check player in game
-            if (monopolyManager.playerInGame == 1)
+            if (monopolyManager.playerLose.Count == monopolyManager.playerAmount - 1)
             {
-                monopolyManager.isEndGame = true;
+                monopolyManager.Summary();
                 print("End Game");
             }
         }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 
 public class MonopolyManager : MonoBehaviour
@@ -8,7 +9,7 @@ public class MonopolyManager : MonoBehaviour
     [Header("Game System")]
     [SerializeField] private Board board;
     public Board GetBoard => board;
-    public bool isEndGame;
+    public bool isEndGame { get; private set; }
 
     [Header("Dice")]
     [SerializeField] private int diceFacesAmount = 6;
@@ -24,7 +25,7 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private Player[] players;
     public Player[] GetPlayers => players;
     public int playerAmount { get; private set; }
-    public int playerInGame;
+    public List<Player> playerLose;
 
     [Header("User Interface")]
     [SerializeField] private Image colorPicking;
@@ -35,12 +36,13 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private Image[] playerHUD;
     [SerializeField] private TextMeshProUGUI[] playerPointText;
     [SerializeField] private TextMeshProUGUI[] playerPointStatusText;
+    [SerializeField] private Image[] playerRanking;
 
     public void SetupPlayer(int playerAmount, int[] playerColorIndex)
     {
         // Set player amount
         this.playerAmount = playerAmount;
-        this.playerInGame = playerAmount;
+        playerLose = new List<Player>();
 
         // Disable player
         for (int i = 0; i < players.Length; i++)
@@ -214,5 +216,26 @@ public class MonopolyManager : MonoBehaviour
         // Setup ui
         colorPicking.gameObject.SetActive(false);
         rollButton.gameObject.SetActive(true);
+    }
+
+    public void Summary()
+    {
+        isEndGame = true;
+        NextTurn();
+
+        for (int i = 0; i < playerRanking.Length; i++)
+        {
+            playerRanking[i].gameObject.SetActive(true);
+
+            if (i < playerRanking.Length - 1)
+            {
+                playerRanking[i].GetComponentInChildren<TextMeshProUGUI>().text = "Lose";
+                playerRanking[i].color = colorMaterials[(int)playerLose[i].playerColor].color;
+            }
+            else
+            {
+                playerRanking[i].color = colorMaterials[(int)players[currentPlayerTurnIndex].playerColor].color;
+            }
+        }
     }
 }
