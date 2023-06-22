@@ -9,11 +9,9 @@ public class Board
     [Header("Edge Settings")]
     [SerializeField] private int edgePerRow = 6;
     [SerializeField] private int maxEdgePoint = 3;
-
-    [SerializeField] private List<Edge> edges;
     [SerializeField] private GameObject edgePrefab;
-    public List<GameObject> edgesBlocks { get; private set; }
-    public List<GameObject> edgeCorner { get; private set; }
+    [SerializeField] private GameObject edgeCornerPrefab;
+    public List<Edge> edges { get; private set; }
 
     public void Init()
     {
@@ -29,15 +27,7 @@ public class Board
 
         // Create edges
         edges = new List<Edge>();
-        for (int i = 0; i < edgesAmount; i++)
-        {
-            Edge newEdge = new Edge(i, cornerIndexes.Contains(i) ? EdgeType.CornerEdge : EdgeType.NormalEdge);
-            edges.Add(newEdge);
-        }
-
         Vector3 startSpawnPosition = Vector3.zero;
-        edgesBlocks = new List<GameObject>();
-        edgeCorner = new List<GameObject>();
 
         for (int i = 0; i < 4; i++)
         {
@@ -49,50 +39,66 @@ public class Board
                 // Skip last index of last row
                 if (i == 3 && j == edgePerRow - 1) continue;
 
-                // Create edge block
-                GameObject newEdge = Object.Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
-                newEdge.name = string.Format("Row ({0}) | Edge ({1})", i, j);
+                // Create edge
+                GameObject newEdgeObject;
+                Edge newEdge = new Edge(maxEdgePoint);
 
-                // Add to list
-                edgesBlocks.Add(newEdge);
-
-                // Set edge block color
+                // Set edge block color (corner) 
                 if (j == 0)
                 {
-                    int colorIndex = (int)monopolyManager.GetPlayers[0].playerColor;
-                    newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
-                    edgeCorner.Add(newEdge);
-                }
+                    newEdgeObject = Object.Instantiate(edgeCornerPrefab, Vector3.zero, Quaternion.identity);
+                    newEdgeObject.name = string.Format("Row ({0}) | Edge ({1}) | Corner", i, j);
 
-                if (j == edgePerRow - 1 && i < monopolyManager.playerAmount - 1)
+                    int colorIndex = (int)monopolyManager.GetPlayers[0].playerColor;
+                    newEdgeObject.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
+
+                    newEdge.SetType(EdgeType.CornerEdge, monopolyManager.GetPlayers[0].playerColor);
+
+                }
+                else if (j == edgePerRow - 1 && i < monopolyManager.playerAmount - 1)
                 {
+                    newEdgeObject = Object.Instantiate(edgeCornerPrefab, Vector3.zero, Quaternion.identity);
+                    newEdgeObject.name = string.Format("Row ({0}) | Edge ({1}) | Corner", i, j);
+
                     int colorIndex = (int)monopolyManager.GetPlayers[i + 1].playerColor;
-                    newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
-                    edgeCorner.Add(newEdge);
+                    newEdgeObject.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
+
+                    newEdge.SetType(EdgeType.CornerEdge, monopolyManager.GetPlayers[i + 1].playerColor);
+                }
+                else
+                {
+                    newEdgeObject = Object.Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
+                    newEdgeObject.name = string.Format("Row ({0}) | Edge ({1})", i, j);
+
+                    newEdge.SetType(EdgeType.NormalEdge, ColorEnum.Null);
                 }
 
                 // Set position
                 switch (i)
                 {
                     case 0:
-                        newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z + j);
+                        newEdgeObject.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z + j);
                         break;
                     case 1:
-                        newEdge.transform.position = new Vector3(startSpawnPosition.x + j, startSpawnPosition.y, startSpawnPosition.z);
+                        newEdgeObject.transform.position = new Vector3(startSpawnPosition.x + j, startSpawnPosition.y, startSpawnPosition.z);
                         break;
                     case 2:
-                        newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z - j);
+                        newEdgeObject.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z - j);
                         break;
                     case 3:
-                        newEdge.transform.position = new Vector3(startSpawnPosition.x - j, startSpawnPosition.y, startSpawnPosition.z);
+                        newEdgeObject.transform.position = new Vector3(startSpawnPosition.x - j, startSpawnPosition.y, startSpawnPosition.z);
                         break;
                 }
 
                 // Save last position for next row
                 if (j == edgePerRow - 1)
                 {
-                    startSpawnPosition = newEdge.transform.position;
+                    startSpawnPosition = newEdgeObject.transform.position;
                 }
+
+                // Add to list
+                newEdge.SetObject(newEdgeObject);
+                edges.Add(newEdge);
             }
         }
     }

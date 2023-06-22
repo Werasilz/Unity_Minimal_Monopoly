@@ -828,6 +828,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerName: 
   playable: 0
+  currentPoint: 0
 --- !u!4 &283552714
 Transform:
   m_ObjectHideFlags: 0
@@ -2865,6 +2866,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerName: 
   playable: 0
+  currentPoint: 0
 --- !u!4 &1169268892
 Transform:
   m_ObjectHideFlags: 0
@@ -3124,6 +3126,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerName: 
   playable: 0
+  currentPoint: 0
 --- !u!4 &1338968915
 Transform:
   m_ObjectHideFlags: 0
@@ -4232,8 +4235,8 @@ MonoBehaviour:
     monopolyManager: {fileID: 1726075003}
     edgePerRow: 6
     maxEdgePoint: 3
-    edges: []
     edgePrefab: {fileID: 1084210003967895542, guid: 17fc18a761f1e92428d4e5c4c70d6ad4, type: 3}
+    edgeCornerPrefab: {fileID: 1084210003967895542, guid: 775a20ac91eb3754bbd23ec94231fc79, type: 3}
   diceFacesAmount: 6
   colorPicking: {fileID: 376632337}
   rollButton: {fileID: 1135320793}
@@ -4250,13 +4253,14 @@ MonoBehaviour:
   - {fileID: 2131083434}
   - {fileID: 25176062}
   - {fileID: 594450862}
+  defaultColorMaterial: {fileID: 2100000, guid: 036cade167bb78e43bb143d0b696f8c7, type: 2}
   colorMaterials:
   - {fileID: 2100000, guid: c57e1b3b2a210364391eb22fecabd164, type: 2}
   - {fileID: 2100000, guid: bdf7a13172e78be4d972c3536cd69032, type: 2}
   - {fileID: 2100000, guid: 26b6ee82d69e6a14985718645a5a0f6e, type: 2}
   - {fileID: 2100000, guid: bec5c05cd2165e744a813243b7efe5ab, type: 2}
   pawnPrefab: {fileID: 229766002878419831, guid: 614a66564ccb3554bb44fd6b349597bf, type: 3}
-  currentPlayerTurn: {fileID: 0}
+  currentPlayerTurnIndex: 0
   players:
   - {fileID: 2028784559}
   - {fileID: 283552713}
@@ -4981,6 +4985,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerName: 
   playable: 0
+  currentPoint: 0
 --- !u!4 &2028784560
 Transform:
   m_ObjectHideFlags: 0

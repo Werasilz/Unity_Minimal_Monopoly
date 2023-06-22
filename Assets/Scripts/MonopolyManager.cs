@@ -22,6 +22,7 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] playerPointText;
 
     [Header("Colors")]
+    public Material defaultColorMaterial;
     public Material[] colorMaterials;
 
     [Header("Players")]
@@ -55,12 +56,24 @@ public class MonopolyManager : MonoBehaviour
         board.Init();
 
         // Spawn player pawn
-        for (int i = 0; i < playerAmount; i++)
+        int playerSpawned = 0;
+
+        for (int i = 0; i < board.edges.Count; i++)
         {
-            GameObject newPawn = Instantiate(pawnPrefab, board.edgeCorner[i].transform.position + Vector3.up, Quaternion.identity);
-            newPawn.GetComponentInChildren<Renderer>().material = colorMaterials[(int)players[i].playerColor];
-            players[i].transform.position = newPawn.transform.position;
-            newPawn.transform.SetParent(players[i].transform);
+            if (board.edges[i].edgeType == EdgeType.CornerEdge)
+            {
+                // Spawn pawn object
+                GameObject newPawn = Instantiate(pawnPrefab, board.edges[i].edgeObject.transform.position + Vector3.up, Quaternion.identity);
+
+                // Set parent
+                players[playerSpawned].transform.position = newPawn.transform.position;
+                newPawn.transform.SetParent(players[playerSpawned].transform);
+
+                // Set color
+                int colorIndex = (int)players[playerSpawned].playerColor;
+                newPawn.GetComponentInChildren<Renderer>().material = colorMaterials[colorIndex];
+                playerSpawned += 1;
+            }
         }
 
         // Pick first player to play
@@ -77,6 +90,7 @@ public class MonopolyManager : MonoBehaviour
         }
 
         playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
+        print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
     }
 
     public void RollADice()
@@ -106,11 +120,13 @@ public class MonopolyManager : MonoBehaviour
                 yield return new WaitForSeconds(delay);
             }
 
+            print(players[currentPlayerTurnIndex].playerColor.ToString() + " dice = " + lastNumber);
             yield return new WaitForSeconds(1f);
             diceImage.gameObject.SetActive(false);
 
             // Move the pawn
             players[currentPlayerTurnIndex].Move(lastNumber);
+            playerPointText[currentPlayerTurnIndex].text = "Point:" + players[currentPlayerTurnIndex].currentPoint.ToString();
 
             // Next player's turn
             NextTurn();
@@ -124,6 +140,24 @@ public class MonopolyManager : MonoBehaviour
     {
         // Show color picking ui
         colorPicking.gameObject.SetActive(true);
+
+        // Disable player ui
+        for (int i = 0; i < 4; i++)
+        {
+            playerHUD[i].color = colorMaterials[(int)players[i].playerColor].color;
+
+            if (i < playerAmount)
+            {
+                playerHUD[i].gameObject.SetActive(true);
+                playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
+            }
+            else
+            {
+                playerHUD[i].gameObject.SetActive(false);
+            }
+        }
+
+        // Random first player
         int lastRandom = 0;
 
         for (int i = 0; i < 20; i++)
@@ -146,27 +180,12 @@ public class MonopolyManager : MonoBehaviour
         // Set first player to play
         currentPlayerTurnIndex = lastRandom;
         playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
+        print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
 
         yield return new WaitForSeconds(1f);
 
         // Setup ui
         colorPicking.gameObject.SetActive(false);
         rollButton.gameObject.SetActive(true);
-
-        // Disable player ui
-        for (int i = 0; i < 4; i++)
-        {
-            playerHUD[i].color = colorMaterials[(int)players[i].playerColor].color;
-
-            if (i < playerAmount)
-            {
-                playerHUD[i].gameObject.SetActive(true);
-                playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
-            }
-            else
-            {
-                playerHUD[i].gameObject.SetActive(false);
-            }
-        }
     }
 }
