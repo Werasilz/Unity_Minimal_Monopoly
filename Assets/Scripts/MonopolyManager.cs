@@ -12,6 +12,19 @@ public class MonopolyManager : MonoBehaviour
     [Header("Dice")]
     [SerializeField] private int diceFacesAmount = 6;
 
+    [Header("Colors")]
+    public Material defaultColorMaterial;
+    public Material[] colorMaterials;
+
+    [Header("Players")]
+    [SerializeField] private int startPoint = 9;
+    [SerializeField] private GameObject pawnPrefab;
+    [SerializeField] private int currentPlayerTurnIndex;
+    [SerializeField] private Player[] players;
+    public Player[] GetPlayers => players;
+    public int playerAmount { get; private set; }
+    public int playerInGame;
+
     [Header("User Interface")]
     [SerializeField] private Image colorPicking;
     [SerializeField] private Button rollButton;
@@ -21,21 +34,11 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private Image[] playerHUD;
     [SerializeField] private TextMeshProUGUI[] playerPointText;
 
-    [Header("Colors")]
-    public Material defaultColorMaterial;
-    public Material[] colorMaterials;
-
-    [Header("Players")]
-    [SerializeField] private GameObject pawnPrefab;
-    [SerializeField] private int currentPlayerTurnIndex;
-    [SerializeField] private Player[] players;
-    public Player[] GetPlayers => players;
-    public int playerAmount { get; private set; }
-
     public void SetupPlayer(int playerAmount, int[] playerColorIndex)
     {
         // Set player amount
         this.playerAmount = playerAmount;
+        this.playerInGame = playerAmount;
 
         // Disable player
         for (int i = 0; i < players.Length; i++)
@@ -49,7 +52,7 @@ public class MonopolyManager : MonoBehaviour
         // Set player color
         for (int i = 0; i < playerAmount; i++)
         {
-            players[i].Init(i, playerColorIndex[i]);
+            players[i].Init(startPoint, i, playerColorIndex[i]);
         }
 
         // Setup board
@@ -89,8 +92,15 @@ public class MonopolyManager : MonoBehaviour
             currentPlayerTurnIndex = 0;
         }
 
-        playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
-        print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
+        if (players[currentPlayerTurnIndex].playable)
+        {
+            playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
+            print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
+        }
+        else
+        {
+            NextTurn();
+        }
     }
 
     public void RollADice()

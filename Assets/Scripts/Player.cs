@@ -6,15 +6,15 @@ public class Player : MonoBehaviour
 
     [Header("Player Attributes")]
     [SerializeField] private string playerName;
-    [SerializeField] private bool playable;
+    public bool playable { get; private set; }
     public ColorEnum playerColor { get; private set; }
     public int currentPoint;
     private int currentEdgeIndex;
 
-    public void Init(int playerIndex, int colorIndex)
+    public void Init(int startPoint, int playerIndex, int colorIndex)
     {
         playerColor = (ColorEnum)colorIndex;
-        currentPoint = 9;
+        currentPoint = startPoint;
         playable = true;
         playerName = playerColor.ToString();
         currentEdgeIndex = monopolyManager.GetBoard.GetCornerIndex(playerIndex);
@@ -49,12 +49,14 @@ public class Player : MonoBehaviour
                 if (currentEdge.edgeColor == ColorEnum.Null)
                 {
                     currentEdge.BuyEdge(monopolyManager, this);
+                    CheckWinning();
                     print(playerName + " buy empty edge");
                 }
                 // Edge have same color as the player
                 else if (currentEdge.edgeColor == playerColor)
                 {
                     currentEdge.BuyEdge(monopolyManager, this);
+                    CheckWinning();
                     print(playerName + " buy edge");
                 }
                 // Edge have not same color as the player
@@ -62,15 +64,8 @@ public class Player : MonoBehaviour
                 {
                     currentPoint -= currentEdge.edgePoint;
                     currentEdge.Reset(monopolyManager);
+                    CheckWinning();
                     print(playerName + " stand on other player's edge");
-
-                    // Check for lose
-                    if (currentPoint <= 0)
-                    {
-                        print(playerName + " Game Over");
-                    }
-
-                    // Check player in game
                 }
                 break;
             case EdgeType.CornerEdge:
@@ -88,6 +83,23 @@ public class Player : MonoBehaviour
         }
 
         print("===========End Turn===========");
+    }
+
+    private void CheckWinning()
+    {
+        // Check for lose
+        if (currentPoint <= 0)
+        {
+            print(playerName + " Game Over");
+            playable = false;
+            monopolyManager.playerInGame -= 1;
+
+            // Check player in game
+            if (monopolyManager.playerInGame == 1)
+            {
+                print("End Game");
+            }
+        }
     }
 }
 
