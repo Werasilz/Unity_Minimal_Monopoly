@@ -26,14 +26,10 @@ public class MonopolyManager : MonoBehaviour
 
     [Header("Players")]
     [SerializeField] private GameObject pawnPrefab;
-    [SerializeField] private Player currentPlayerTurn;
-    public Player[] players { get; private set; }
+    [SerializeField] private int currentPlayerTurnIndex;
+    [SerializeField] private Player[] players;
+    public Player[] GetPlayers => players;
     public int playerAmount { get; private set; }
-
-    private void Start()
-    {
-        players = GetComponentsInChildren<Player>();
-    }
 
     public void SetupPlayer(int playerAmount, int[] playerColorIndex)
     {
@@ -52,7 +48,7 @@ public class MonopolyManager : MonoBehaviour
         // Set player color
         for (int i = 0; i < playerAmount; i++)
         {
-            players[i].Init(playerColorIndex[i]);
+            players[i].Init(i, playerColorIndex[i]);
         }
 
         // Setup board
@@ -63,16 +59,24 @@ public class MonopolyManager : MonoBehaviour
         {
             GameObject newPawn = Instantiate(pawnPrefab, board.edgeCorner[i].transform.position + Vector3.up, Quaternion.identity);
             newPawn.GetComponentInChildren<Renderer>().material = colorMaterials[(int)players[i].playerColor];
+            players[i].transform.position = newPawn.transform.position;
+            newPawn.transform.SetParent(players[i].transform);
         }
 
         // Pick first player to play
         StartCoroutine(PickFirstPlayer());
     }
 
-    private void NextTurn(Player nextPlayer)
+    private void NextTurn()
     {
-        currentPlayerTurn = nextPlayer;
-        playerTurnText.text = "Player " + currentPlayerTurn.playerColor.ToString() + "'s turn";
+        currentPlayerTurnIndex += 1;
+
+        if (currentPlayerTurnIndex > playerAmount - 1)
+        {
+            currentPlayerTurnIndex = 0;
+        }
+
+        playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
     }
 
     public void RollADice()
@@ -85,7 +89,7 @@ public class MonopolyManager : MonoBehaviour
             diceImage.gameObject.SetActive(true);
             int lastNumber = 0;
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 20; i++)
             {
                 // Roll a dice
                 int newNumber = Random.Range(1, diceFacesAmount + 1);
@@ -104,6 +108,15 @@ public class MonopolyManager : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
             diceImage.gameObject.SetActive(false);
+
+            // Move the pawn
+            players[currentPlayerTurnIndex].Move(lastNumber);
+
+            // Next player's turn
+            NextTurn();
+
+            // Enable roll button for next player
+            rollButton.gameObject.SetActive(true);
         }
     }
 
@@ -113,7 +126,7 @@ public class MonopolyManager : MonoBehaviour
         colorPicking.gameObject.SetActive(true);
         int lastRandom = 0;
 
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 20; i++)
         {
             // Random player
             int newRandom = Random.Range(0, playerAmount);
@@ -131,7 +144,8 @@ public class MonopolyManager : MonoBehaviour
         }
 
         // Set first player to play
-        NextTurn(players[lastRandom]);
+        currentPlayerTurnIndex = lastRandom;
+        playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
 
         yield return new WaitForSeconds(1f);
 

@@ -7,6 +7,7 @@ public class Edge
     [SerializeField] private EdgeType edgeType;
     [SerializeField] private EdgeColor edgeColor;
     [SerializeField] private int edgePoint = 0;
+    [SerializeField] private Vector3 edgePosition;
 
     public Edge(int edgeIndex, EdgeType edgeType)
     {
@@ -14,6 +15,7 @@ public class Edge
         this.edgeType = edgeType;
         this.edgeColor = EdgeColor.Null;
         this.edgePoint = 0;
+        this.edgePosition = Vector3.zero;
     }
 
     public void SetType(EdgeType newEdgeType)

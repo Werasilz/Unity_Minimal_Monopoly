@@ -12,6 +12,7 @@ public class Board
 
     [SerializeField] private List<Edge> edges;
     [SerializeField] private GameObject edgePrefab;
+    public List<GameObject> edgesBlocks { get; private set; }
     public List<GameObject> edgeCorner { get; private set; }
 
     public void Init()
@@ -35,6 +36,7 @@ public class Board
         }
 
         Vector3 startSpawnPosition = Vector3.zero;
+        edgesBlocks = new List<GameObject>();
         edgeCorner = new List<GameObject>();
 
         for (int i = 0; i < 4; i++)
@@ -51,17 +53,20 @@ public class Board
                 GameObject newEdge = Object.Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
                 newEdge.name = string.Format("Row ({0}) | Edge ({1})", i, j);
 
+                // Add to list
+                edgesBlocks.Add(newEdge);
+
                 // Set edge block color
                 if (j == 0)
                 {
-                    int colorIndex = (int)monopolyManager.players[0].playerColor;
+                    int colorIndex = (int)monopolyManager.GetPlayers[0].playerColor;
                     newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
                     edgeCorner.Add(newEdge);
                 }
 
                 if (j == edgePerRow - 1 && i < monopolyManager.playerAmount - 1)
                 {
-                    int colorIndex = (int)monopolyManager.players[i + 1].playerColor;
+                    int colorIndex = (int)monopolyManager.GetPlayers[i + 1].playerColor;
                     newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
                     edgeCorner.Add(newEdge);
                 }
@@ -92,14 +97,14 @@ public class Board
         }
     }
 
-    public int GetCornerIndex(int colorIndex)
+    public int GetCornerIndex(int playerIndex)
     {
         // 2 is corner edge per row
         // edge per row - corer edge per row
         // 6 - 2 = 4 
         // normal edge per row is 4
-        // multiply by color index
-        return ((edgePerRow - 2) + 1) * colorIndex;
+        // multiply by player index
+        return ((edgePerRow - 2) + 1) * playerIndex;
     }
 
     public void CheckEdge(Player player)
