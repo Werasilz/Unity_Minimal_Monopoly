@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class Edge
@@ -6,7 +7,7 @@ public class Edge
     public EdgeType edgeType { get; private set; }
     public ColorEnum edgeColor { get; private set; }
     public GameObject edgeObject { get; private set; }
-    private GameObject[] edgePointObject;
+    private List<GameObject> edgePointObject;
     public int edgePoint { get; private set; }
     private int maxEdgePoint;
 
@@ -22,12 +23,22 @@ public class Edge
         this.edgeColor = ColorEnum.Null;
         this.edgePoint = 0;
         edgeObject.GetComponent<Renderer>().material = monopolyManager.defaultColorMaterial;
+
+        for (int i = 0; i < edgePointObject.Count; i++)
+        {
+            edgePointObject[i].SetActive(false);
+        }
     }
 
     public void SetObject(GameObject newObject)
     {
         edgeObject = newObject;
-        edgePointObject = edgeObject.transform.GetComponentsInChildren<GameObject>();
+        edgePointObject = new List<GameObject>();
+
+        foreach (Transform child in edgeObject.transform)
+        {
+            edgePointObject.Add(child.gameObject);
+        }
     }
 
     public void SetType(EdgeType newEdgeType, ColorEnum color)

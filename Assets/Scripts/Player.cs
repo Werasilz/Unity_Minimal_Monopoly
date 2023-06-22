@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections;
+using System.Linq;
 
 public class Player : MonoBehaviour
 {
@@ -52,34 +52,49 @@ public class Player : MonoBehaviour
                 if (currentEdge.edgeColor == ColorEnum.Null)
                 {
                     currentEdge.BuyEdge(monopolyManager, this);
+
                     CheckWinning();
-                    print(playerName + " buy empty edge");
+                    print(playerName + " buy empty edge, point -1");
                 }
                 // Edge have same color as the player
                 else if (currentEdge.edgeColor == playerColor)
                 {
                     currentEdge.BuyEdge(monopolyManager, this);
+
                     CheckWinning();
-                    print(playerName + " buy edge");
+                    print(playerName + " buy edge, point -1");
                 }
                 // Edge have not same color as the player
                 else
                 {
+                    // Remove point by edge point
                     currentPoint -= currentEdge.edgePoint;
+                    print(playerName + " stand on other player's edge, point -" + currentEdge.edgePoint);
+
+                    // Add point to edge owner
+                    foreach (Player player in monopolyManager.GetPlayers)
+                    {
+                        if (player.playerColor == currentEdge.edgeColor)
+                        {
+                            player.currentPoint += currentEdge.edgePoint;
+                            print(player.playerName + " +" + currentEdge.edgePoint + " from " + this.playerName);
+                        }
+                    }
+
                     currentEdge.Reset(monopolyManager);
                     CheckWinning();
-                    print(playerName + " stand on other player's edge");
                 }
                 break;
             case EdgeType.CornerEdge:
                 if (currentEdge.edgeColor == playerColor)
                 {
-                    print(playerName + " stand on edge corner same color as the player");
+                    print(playerName + " stand on edge corner same color as the player, point +3");
                     currentPoint += 3;
+
                 }
                 else
                 {
-                    print(playerName + " stand on edge corner not same color as the player");
+                    print(playerName + " stand on edge corner not same color as the player, point +1");
                     currentPoint += 1;
                 }
                 break;
@@ -94,6 +109,7 @@ public class Player : MonoBehaviour
         if (currentPoint <= 0)
         {
             print(playerName + " Game Over");
+            gameObject.SetActive(false);
             playable = false;
             monopolyManager.playerInGame -= 1;
 

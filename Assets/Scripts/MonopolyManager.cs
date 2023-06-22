@@ -34,6 +34,7 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI diceNumberText;
     [SerializeField] private Image[] playerHUD;
     [SerializeField] private TextMeshProUGUI[] playerPointText;
+    [SerializeField] private TextMeshProUGUI[] playerPointStatusText;
 
     public void SetupPlayer(int playerAmount, int[] playerColorIndex)
     {
@@ -144,7 +145,12 @@ public class MonopolyManager : MonoBehaviour
 
             // Move the pawn
             players[currentPlayerTurnIndex].Move(lastNumber);
-            playerPointText[currentPlayerTurnIndex].text = "Point:" + players[currentPlayerTurnIndex].currentPoint.ToString();
+
+            // Update point text
+            for (int i = 0; i < playerPointText.Length; i++)
+            {
+                playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
+            }
 
             if (isEndGame == false)
             {
