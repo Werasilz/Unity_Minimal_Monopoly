@@ -54,14 +54,14 @@ public class Board
                 // Set edge block color
                 if (j == 0)
                 {
-                    int colorIndex = (int)monopolyManager.players[0].GetColor;
+                    int colorIndex = (int)monopolyManager.players[0].playerColor;
                     newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
                     edgeCorner.Add(newEdge);
                 }
 
                 if (j == edgePerRow - 1 && i < monopolyManager.playerAmount - 1)
                 {
-                    int colorIndex = (int)monopolyManager.players[i + 1].GetColor;
+                    int colorIndex = (int)monopolyManager.players[i + 1].playerColor;
                     newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
                     edgeCorner.Add(newEdge);
                 }

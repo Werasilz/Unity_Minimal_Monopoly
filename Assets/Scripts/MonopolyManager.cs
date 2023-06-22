@@ -1,12 +1,22 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using TMPro;
 
 public class MonopolyManager : MonoBehaviour
 {
     [Header("Game System")]
     [SerializeField] private Board board;
     public Board GetBoard => board;
-    [SerializeField] private Dice dice;
-    public Dice GetDice => dice;
+
+    [Header("Dice")]
+    [SerializeField] private int diceFacesAmount = 6;
+
+    [Header("User Interface")]
+    [SerializeField] private Image colorPicking;
+    [SerializeField] private Button rollButton;
+    [SerializeField] private Image[] playerHUD;
+    [SerializeField] private TextMeshProUGUI[] playerPointText;
 
     [Header("Colors")]
     public Material[] colorMaterials;
@@ -49,22 +59,74 @@ public class MonopolyManager : MonoBehaviour
         for (int i = 0; i < playerAmount; i++)
         {
             GameObject newPawn = Instantiate(pawnPrefab, board.edgeCorner[i].transform.position + Vector3.up, Quaternion.identity);
-            newPawn.GetComponentInChildren<Renderer>().material = colorMaterials[(int)players[i].GetColor];
+            newPawn.GetComponentInChildren<Renderer>().material = colorMaterials[(int)players[i].playerColor];
         }
+
+        // Pick first player to play
+        StartCoroutine(PickFirstPlayer());
     }
 
-    void PickFirstPlayer()
+    public void NextTurn(Player nextPlayer)
     {
-
-    }
-
-    public void NextTurn()
-    {
-
+        currentPlayerTurn = nextPlayer;
     }
 
     public void CheckWinning()
     {
 
+    }
+
+    public void RollADice()
+    {
+        int rollNumber = Random.Range(1, diceFacesAmount + 1);
+    }
+
+    private IEnumerator PickFirstPlayer()
+    {
+        // Show color picking ui
+        colorPicking.gameObject.SetActive(true);
+        int lastRandom = 0;
+
+        for (int i = 0; i < 50; i++)
+        {
+            // Random player
+            int newRandom = Random.Range(0, playerAmount);
+            if (newRandom == lastRandom) continue;
+
+            // Set color
+            colorPicking.color = colorMaterials[(int)players[newRandom].playerColor].color;
+
+            // Set last random
+            lastRandom = newRandom;
+
+            // Delay the random
+            float delay = 0.15f + (i / 100);
+            yield return new WaitForSeconds(delay);
+        }
+
+        // Set first player to play
+        NextTurn(players[lastRandom]);
+
+        yield return new WaitForSeconds(1f);
+
+        // Setup ui
+        colorPicking.gameObject.SetActive(false);
+        rollButton.gameObject.SetActive(true);
+
+        // Disable player ui
+        for (int i = 0; i < 4; i++)
+        {
+            playerHUD[i].color = colorMaterials[(int)players[i].playerColor].color;
+
+            if (i < playerAmount - 1)
+            {
+                playerHUD[i].gameObject.SetActive(true);
+                playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
+            }
+            else
+            {
+                playerHUD[i].gameObject.SetActive(false);
+            }
+        }
     }
 }
