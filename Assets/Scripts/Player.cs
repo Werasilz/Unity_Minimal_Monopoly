@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class Player : MonoBehaviour
 
     public void Move(int steps)
     {
+        // Next edge index
         currentEdgeIndex += steps;
 
         // Out of edge array
@@ -33,7 +35,8 @@ public class Player : MonoBehaviour
 
         // Set pawn position
         print(playerName + " move to edge " + currentEdgeIndex);
-        transform.position = monopolyManager.GetBoard.edges[currentEdgeIndex].edgeObject.transform.position + Vector3.up;
+        Vector3 targetPosition = monopolyManager.GetBoard.edges[currentEdgeIndex].edgeObject.transform.position + Vector3.up;
+        transform.position = targetPosition;
 
         EdgeAction();
     }
@@ -97,6 +100,7 @@ public class Player : MonoBehaviour
             // Check player in game
             if (monopolyManager.playerInGame == 1)
             {
+                monopolyManager.isEndGame = true;
                 print("End Game");
             }
         }

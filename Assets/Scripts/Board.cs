@@ -73,6 +73,9 @@ public class Board
                     newEdge.SetType(EdgeType.NormalEdge, ColorEnum.Null);
                 }
 
+                // Set parent
+                newEdgeObject.transform.SetParent(monopolyManager.transform);
+
                 // Set position
                 switch (i)
                 {
@@ -111,15 +114,5 @@ public class Board
         // normal edge per row is 4
         // multiply by player index
         return ((edgePerRow - 2) + 1) * playerIndex;
-    }
-
-    public void CheckEdge(Player player)
-    {
-
-    }
-
-    public void BuyEdge(Player player)
-    {
-
     }
 }

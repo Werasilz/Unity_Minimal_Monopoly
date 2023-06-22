@@ -4234,6 +4234,7 @@ MonoBehaviour:
     maxEdgePoint: 3
     edgePrefab: {fileID: 1084210003967895542, guid: 17fc18a761f1e92428d4e5c4c70d6ad4, type: 3}
     edgeCornerPrefab: {fileID: 1084210003967895542, guid: 775a20ac91eb3754bbd23ec94231fc79, type: 3}
+  isEndGame: 0
   diceFacesAmount: 6
   defaultColorMaterial: {fileID: 2100000, guid: 036cade167bb78e43bb143d0b696f8c7, type: 2}
   colorMaterials:
@@ -4241,7 +4242,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: bdf7a13172e78be4d972c3536cd69032, type: 2}
   - {fileID: 2100000, guid: 26b6ee82d69e6a14985718645a5a0f6e, type: 2}
   - {fileID: 2100000, guid: bec5c05cd2165e744a813243b7efe5ab, type: 2}
-  startPoint: 2
+  startPoint: 9
   pawnPrefab: {fileID: 229766002878419831, guid: 614a66564ccb3554bb44fd6b349597bf, type: 3}
   currentPlayerTurnIndex: 0
   players:

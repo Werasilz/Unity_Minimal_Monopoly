@@ -8,6 +8,7 @@ public class MonopolyManager : MonoBehaviour
     [Header("Game System")]
     [SerializeField] private Board board;
     public Board GetBoard => board;
+    public bool isEndGame;
 
     [Header("Dice")]
     [SerializeField] private int diceFacesAmount = 6;
@@ -85,18 +86,25 @@ public class MonopolyManager : MonoBehaviour
 
     private void NextTurn()
     {
+        // Enable roll button for next player
+        rollButton.gameObject.SetActive(true);
+
+        // Next player index
         currentPlayerTurnIndex += 1;
 
+        // Back to first player index
         if (currentPlayerTurnIndex > playerAmount - 1)
         {
             currentPlayerTurnIndex = 0;
         }
 
+        // Player still can play
         if (players[currentPlayerTurnIndex].playable)
         {
             playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
             print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
         }
+        // Skip lose player
         else
         {
             NextTurn();
@@ -138,11 +146,14 @@ public class MonopolyManager : MonoBehaviour
             players[currentPlayerTurnIndex].Move(lastNumber);
             playerPointText[currentPlayerTurnIndex].text = "Point:" + players[currentPlayerTurnIndex].currentPoint.ToString();
 
-            // Next player's turn
-            NextTurn();
+            if (isEndGame == false)
+            {
+                // Next player's turn
+                NextTurn();
 
-            // Enable roll button for next player
-            rollButton.gameObject.SetActive(true);
+                // Enable roll button for next player
+                rollButton.gameObject.SetActive(true);
+            }
         }
     }
 
