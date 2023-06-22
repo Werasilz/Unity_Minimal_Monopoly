@@ -558,7 +558,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerColor: 0
   playerName: 
-  currentPoint: 9
+  currentPoint: 0
 --- !u!4 &283552714
 Transform:
   m_ObjectHideFlags: 0
@@ -1646,7 +1646,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerColor: 0
   playerName: 
-  currentPoint: 9
+  currentPoint: 0
 --- !u!4 &1169268892
 Transform:
   m_ObjectHideFlags: 0
@@ -1829,7 +1829,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerColor: 0
   playerName: 
-  currentPoint: 9
+  currentPoint: 0
 --- !u!4 &1338968915
 Transform:
   m_ObjectHideFlags: 0
@@ -2784,16 +2784,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59ff9ed035218894397b2cee816c1346, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  board:
+    edgePerRow: 6
+    maxEdgePoint: 3
+    edges: []
   players:
   - {fileID: 2028784559}
   - {fileID: 283552713}
   - {fileID: 1169268891}
   - {fileID: 1338968914}
   currentPlayerTurn: {fileID: 0}
-  board:
-    edgePerRow: 6
-    maxEdgePoint: 3
-    edges: []
 --- !u!4 &1726075004
 Transform:
   m_ObjectHideFlags: 0
@@ -3247,7 +3247,7 @@ MonoBehaviour:
   monopolyManager: {fileID: 1726075003}
   playerColor: 0
   playerName: 
-  currentPoint: 9
+  currentPoint: 0
 --- !u!4 &2028784560
 Transform:
   m_ObjectHideFlags: 0

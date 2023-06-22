@@ -13,14 +13,6 @@ public class MonopolyManager : MonoBehaviour
         board.Init();
     }
 
-    public void SetPlayerColor(int[] playerColorIndex)
-    {
-        for (int i = 0; i < players.Length; i++)
-        {
-            players[i].Init(playerColorIndex[i]);
-        }
-    }
-
     public void SetPlayerAmount(int playerAmount)
     {
         this.playerAmount = playerAmount;
@@ -31,6 +23,14 @@ public class MonopolyManager : MonoBehaviour
             {
                 players[i].gameObject.SetActive(false);
             }
+        }
+    }
+
+    public void SetPlayerColor(int[] playerColorIndex)
+    {
+        for (int i = 0; i < playerAmount; i++)
+        {
+            players[i].Init(playerColorIndex[i]);
         }
     }
 

@@ -7,8 +7,8 @@ public class Player : MonoBehaviour
     [Header("Player Attributes")]
     [SerializeField] private PlayerColor playerColor;
     [SerializeField] private string playerName;
-    [SerializeField] private int currentPoint = 9;
-    private bool playable = true;
+    [SerializeField] private int currentPoint;
+    [SerializeField] private bool playable;
     private int currentEdgeIndex;
 
     public void Init(int colorIndex)
