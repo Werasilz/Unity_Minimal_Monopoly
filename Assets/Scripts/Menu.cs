@@ -68,9 +68,8 @@ public class Menu : MonoBehaviour
             }
         }
 
-        // Set color to players
-        monopolyManager.SetPlayerAmount(playerAmount);
-        monopolyManager.SetPlayerColor(playerColorIndex);
+        // Setup players
+        monopolyManager.SetupPlayer(playerAmount, playerColorIndex);
 
         // Disable menu
         gameObject.SetActive(false);

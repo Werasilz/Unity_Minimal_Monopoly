@@ -2924,22 +2924,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board:
+    monopolyManager: {fileID: 1726075003}
     edgePerRow: 6
     maxEdgePoint: 3
     edges: []
     edgePrefab: {fileID: 1084210003967895542, guid: 17fc18a761f1e92428d4e5c4c70d6ad4, type: 3}
-    colorMaterials:
-    - {fileID: 2100000, guid: c57e1b3b2a210364391eb22fecabd164, type: 2}
-    - {fileID: 2100000, guid: bdf7a13172e78be4d972c3536cd69032, type: 2}
-    - {fileID: 2100000, guid: 26b6ee82d69e6a14985718645a5a0f6e, type: 2}
-    - {fileID: 2100000, guid: bec5c05cd2165e744a813243b7efe5ab, type: 2}
   dice:
     diceFacesAmount: 6
-  players:
-  - {fileID: 2028784559}
-  - {fileID: 283552713}
-  - {fileID: 1169268891}
-  - {fileID: 1338968914}
+  colorMaterials:
+  - {fileID: 2100000, guid: c57e1b3b2a210364391eb22fecabd164, type: 2}
+  - {fileID: 2100000, guid: bdf7a13172e78be4d972c3536cd69032, type: 2}
+  - {fileID: 2100000, guid: 26b6ee82d69e6a14985718645a5a0f6e, type: 2}
+  - {fileID: 2100000, guid: bec5c05cd2165e744a813243b7efe5ab, type: 2}
+  pawnPrefab: {fileID: 229766002878419831, guid: 614a66564ccb3554bb44fd6b349597bf, type: 3}
   currentPlayerTurn: {fileID: 0}
 --- !u!4 &1726075004
 Transform:

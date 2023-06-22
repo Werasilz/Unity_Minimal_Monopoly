@@ -4,11 +4,15 @@ using System.Collections.Generic;
 [System.Serializable]
 public class Board
 {
+    [SerializeField] private MonopolyManager monopolyManager;
+
+    [Header("Edge Settings")]
     [SerializeField] private int edgePerRow = 6;
     [SerializeField] private int maxEdgePoint = 3;
+
     [SerializeField] private List<Edge> edges;
     [SerializeField] private GameObject edgePrefab;
-    [SerializeField] private Material[] colorMaterials;
+    public List<GameObject> edgeCorner { get; private set; }
 
     public void Init()
     {
@@ -17,7 +21,7 @@ public class Board
 
         // Get corner indexes
         List<int> cornerIndexes = new List<int>();
-        for (int i = 0; i < maxPlayer; i++)
+        for (int i = 0; i < monopolyManager.playerAmount; i++)
         {
             cornerIndexes.Add(GetCornerIndex(i));
         }
@@ -31,6 +35,7 @@ public class Board
         }
 
         Vector3 startSpawnPosition = Vector3.zero;
+        edgeCorner = new List<GameObject>();
 
         for (int i = 0; i < 4; i++)
         {
@@ -47,8 +52,19 @@ public class Board
                 newEdge.name = string.Format("Row ({0}) | Edge ({1})", i, j);
 
                 // Set edge block color
-                if (j == 0) newEdge.GetComponent<Renderer>().material = colorMaterials[0];
-                if (j == edgePerRow - 1) newEdge.GetComponent<Renderer>().material = colorMaterials[i + 1];
+                if (j == 0)
+                {
+                    int colorIndex = (int)monopolyManager.players[0].GetColor;
+                    newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
+                    edgeCorner.Add(newEdge);
+                }
+
+                if (j == edgePerRow - 1 && i < monopolyManager.playerAmount - 1)
+                {
+                    int colorIndex = (int)monopolyManager.players[i + 1].GetColor;
+                    newEdge.GetComponent<Renderer>().material = monopolyManager.colorMaterials[colorIndex];
+                    edgeCorner.Add(newEdge);
+                }
 
                 // Set position
                 switch (i)

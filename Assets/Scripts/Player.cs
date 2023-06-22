@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 
     [Header("Player Attributes")]
     [SerializeField] private PlayerColor playerColor;
+    public PlayerColor GetColor => playerColor;
     [SerializeField] private string playerName;
     [SerializeField] private int currentPoint;
     [SerializeField] private bool playable;
@@ -35,7 +36,7 @@ public class Player : MonoBehaviour
     }
 }
 
-enum PlayerColor
+public enum PlayerColor
 {
     Red,
     Blue,
