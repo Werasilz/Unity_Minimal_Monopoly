@@ -8,6 +8,7 @@ public class Board
     [SerializeField] private int maxEdgePoint = 3;
     [SerializeField] private List<Edge> edges;
     [SerializeField] private GameObject edgePrefab;
+    [SerializeField] private Material[] colorMaterials;
 
     public void Init()
     {
@@ -45,11 +46,26 @@ public class Board
                 GameObject newEdge = Object.Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
                 newEdge.name = string.Format("Row ({0}) | Edge ({1})", i, j);
 
+                // Set edge block color
+                if (j == 0) newEdge.GetComponent<Renderer>().material = colorMaterials[0];
+                if (j == edgePerRow - 1) newEdge.GetComponent<Renderer>().material = colorMaterials[i + 1];
+
                 // Set position
-                if (i == 0) newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z + j);
-                else if (i == 1) newEdge.transform.position = new Vector3(startSpawnPosition.x + j, startSpawnPosition.y, startSpawnPosition.z);
-                else if (i == 2) newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z - j);
-                else if (i == 3) newEdge.transform.position = new Vector3(startSpawnPosition.x - j, startSpawnPosition.y, startSpawnPosition.z);
+                switch (i)
+                {
+                    case 0:
+                        newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z + j);
+                        break;
+                    case 1:
+                        newEdge.transform.position = new Vector3(startSpawnPosition.x + j, startSpawnPosition.y, startSpawnPosition.z);
+                        break;
+                    case 2:
+                        newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z - j);
+                        break;
+                    case 3:
+                        newEdge.transform.position = new Vector3(startSpawnPosition.x - j, startSpawnPosition.y, startSpawnPosition.z);
+                        break;
+                }
 
                 // Save last position for next row
                 if (j == edgePerRow - 1)

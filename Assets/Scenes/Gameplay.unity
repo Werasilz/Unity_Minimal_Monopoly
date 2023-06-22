@@ -2928,6 +2928,11 @@ MonoBehaviour:
     maxEdgePoint: 3
     edges: []
     edgePrefab: {fileID: 1084210003967895542, guid: 17fc18a761f1e92428d4e5c4c70d6ad4, type: 3}
+    colorMaterials:
+    - {fileID: 2100000, guid: c57e1b3b2a210364391eb22fecabd164, type: 2}
+    - {fileID: 2100000, guid: bdf7a13172e78be4d972c3536cd69032, type: 2}
+    - {fileID: 2100000, guid: 26b6ee82d69e6a14985718645a5a0f6e, type: 2}
+    - {fileID: 2100000, guid: bec5c05cd2165e744a813243b7efe5ab, type: 2}
   dice:
     diceFacesAmount: 6
   players:
