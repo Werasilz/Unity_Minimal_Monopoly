@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class Dice : MonoBehaviour
+[System.Serializable]
+public class Dice
 {
     [SerializeField] private int diceFacesAmount = 6;
 

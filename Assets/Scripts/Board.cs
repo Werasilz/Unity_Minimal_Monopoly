@@ -7,6 +7,7 @@ public class Board
     [SerializeField] private int edgePerRow = 6;
     [SerializeField] private int maxEdgePoint = 3;
     [SerializeField] private List<Edge> edges;
+    [SerializeField] private GameObject edgePrefab;
 
     public void Init()
     {
@@ -26,6 +27,36 @@ public class Board
         {
             Edge newEdge = new Edge(i, cornerIndexes.Contains(i) ? EdgeType.CornerEdge : EdgeType.NormalEdge);
             edges.Add(newEdge);
+        }
+
+        Vector3 startSpawnPosition = Vector3.zero;
+
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < edgePerRow; j++)
+            {
+                // Skip first index each row
+                if (i > 0 && j == 0) continue;
+
+                // Skip last index of last row
+                if (i == 3 && j == edgePerRow - 1) continue;
+
+                // Create edge block
+                GameObject newEdge = Object.Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
+                newEdge.name = string.Format("Row ({0}) | Edge ({1})", i, j);
+
+                // Set position
+                if (i == 0) newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z + j);
+                else if (i == 1) newEdge.transform.position = new Vector3(startSpawnPosition.x + j, startSpawnPosition.y, startSpawnPosition.z);
+                else if (i == 2) newEdge.transform.position = new Vector3(startSpawnPosition.x, startSpawnPosition.y, startSpawnPosition.z - j);
+                else if (i == 3) newEdge.transform.position = new Vector3(startSpawnPosition.x - j, startSpawnPosition.y, startSpawnPosition.z);
+
+                // Save last position for next row
+                if (j == edgePerRow - 1)
+                {
+                    startSpawnPosition = newEdge.transform.position;
+                }
+            }
         }
     }
 

@@ -2,8 +2,13 @@ using UnityEngine;
 
 public class MonopolyManager : MonoBehaviour
 {
+    [Header("Game System")]
     [SerializeField] private Board board;
     public Board GetBoard => board;
+    [SerializeField] private Dice dice;
+    public Dice GetDice => dice;
+
+    [Header("Players")]
     [SerializeField] private Player[] players;
     [SerializeField] private Player currentPlayerTurn;
     private int playerAmount;
