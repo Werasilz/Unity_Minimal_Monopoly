@@ -5,17 +5,18 @@ public class Player : MonoBehaviour
     [SerializeField] private MonopolyManager monopolyManager;
 
     [Header("Player Attributes")]
-    [SerializeField] private Color color;
+    [SerializeField] private PlayerColor playerColor;
     [SerializeField] private string playerName;
     [SerializeField] private int currentPoint = 9;
     private bool playable = true;
     private int currentEdgeIndex;
 
-    public void Init()
+    public void Init(int colorIndex)
     {
+        playerColor = (PlayerColor)colorIndex;
         currentPoint = 9;
         playable = true;
-        currentEdgeIndex = monopolyManager.GetBoard.GetCornerIndex((int)color);
+        currentEdgeIndex = monopolyManager.GetBoard.GetCornerIndex((int)playerColor);
     }
 
     public void RemovePoint(int removedPoint)
@@ -34,7 +35,7 @@ public class Player : MonoBehaviour
     }
 }
 
-enum Color
+enum PlayerColor
 {
     Red,
     Blue,
