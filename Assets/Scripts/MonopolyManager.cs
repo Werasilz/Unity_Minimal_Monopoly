@@ -15,6 +15,9 @@ public class MonopolyManager : MonoBehaviour
     [Header("User Interface")]
     [SerializeField] private Image colorPicking;
     [SerializeField] private Button rollButton;
+    [SerializeField] private Image diceImage;
+    [SerializeField] private TextMeshProUGUI playerTurnText;
+    [SerializeField] private TextMeshProUGUI diceNumberText;
     [SerializeField] private Image[] playerHUD;
     [SerializeField] private TextMeshProUGUI[] playerPointText;
 
@@ -66,19 +69,42 @@ public class MonopolyManager : MonoBehaviour
         StartCoroutine(PickFirstPlayer());
     }
 
-    public void NextTurn(Player nextPlayer)
+    private void NextTurn(Player nextPlayer)
     {
         currentPlayerTurn = nextPlayer;
-    }
-
-    public void CheckWinning()
-    {
-
+        playerTurnText.text = "Player " + currentPlayerTurn.playerColor.ToString() + "'s turn";
     }
 
     public void RollADice()
     {
-        int rollNumber = Random.Range(1, diceFacesAmount + 1);
+        StartCoroutine(Roll());
+
+        IEnumerator Roll()
+        {
+            rollButton.gameObject.SetActive(false);
+            diceImage.gameObject.SetActive(true);
+            int lastNumber = 0;
+
+            for (int i = 0; i < 50; i++)
+            {
+                // Roll a dice
+                int newNumber = Random.Range(1, diceFacesAmount + 1);
+                if (newNumber == lastNumber) continue;
+
+                // Set number text
+                diceNumberText.text = newNumber.ToString();
+
+                // Set last number
+                lastNumber = newNumber;
+
+                // Delay the random
+                float delay = 0.15f + (i / 100);
+                yield return new WaitForSeconds(delay);
+            }
+
+            yield return new WaitForSeconds(1f);
+            diceImage.gameObject.SetActive(false);
+        }
     }
 
     private IEnumerator PickFirstPlayer()
@@ -118,7 +144,7 @@ public class MonopolyManager : MonoBehaviour
         {
             playerHUD[i].color = colorMaterials[(int)players[i].playerColor].color;
 
-            if (i < playerAmount - 1)
+            if (i < playerAmount)
             {
                 playerHUD[i].gameObject.SetActive(true);
                 playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
