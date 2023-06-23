@@ -6474,7 +6474,7 @@ MonoBehaviour:
     rgba: 4278255615
   - serializedVersion: 2
     rgba: 4278255360
-  startPoint: 9
+  startPoint: 2
   pawnPrefab: {fileID: 229766002878419831, guid: 614a66564ccb3554bb44fd6b349597bf, type: 3}
   players:
   - {fileID: 2028784559}
