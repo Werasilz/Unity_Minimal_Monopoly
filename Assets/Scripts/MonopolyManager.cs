@@ -28,15 +28,24 @@ public class MonopolyManager : MonoBehaviour
     private int currentPlayerTurnIndex;
     public List<Player> playerLose;
 
-    [Header("User Interface")]
+    [Header("Image GUI")]
     [SerializeField] private Image colorPicking;
     [SerializeField] private Image diceImage;
+    [SerializeField] private Image rollButtonImage;
+
+    [Header("Button GUI")]
     [SerializeField] private Button rollButton;
     [SerializeField] private Button newGameButton;
+
+    [Header("Window")]
     [SerializeField] private GameObject buyEdgeWindow;
+
+    [Header("Text GUI")]
     [SerializeField] private TextMeshProUGUI playerTurnText;
     [SerializeField] private TextMeshProUGUI diceNumberText;
+    [SerializeField] private TextMeshProUGUI noticeText;
 
+    [Header("GUI Collections")]
     [SerializeField] private Image[] playerHUD;
     [SerializeField] private TextMeshProUGUI[] playerPointText;
     [SerializeField] private TextMeshProUGUI[] playerPointStatusText;
@@ -136,19 +145,21 @@ public class MonopolyManager : MonoBehaviour
             // Setup ui
             colorPicking.gameObject.SetActive(false);
             rollButton.gameObject.SetActive(true);
+            rollButtonImage.color = colorPicking.color;
         }
     }
 
     private void NextTurn()
     {
-        // Enable roll button for next player
-        rollButton.gameObject.SetActive(true);
-
         // Next player index
         currentPlayerTurnIndex += 1;
 
         // Back to first player index
         if (currentPlayerTurnIndex > playerAmount - 1) currentPlayerTurnIndex = 0;
+
+        // Enable roll button for next player
+        rollButton.gameObject.SetActive(true);
+        rollButtonImage.color = colors[(int)players[currentPlayerTurnIndex].playerColor];
 
         // Player still can play
         if (players[currentPlayerTurnIndex].playable)
@@ -211,6 +222,18 @@ public class MonopolyManager : MonoBehaviour
         buyEdgeWindow.SetActive(true);
     }
 
+    public void NoticeMessage(string text)
+    {
+        StartCoroutine(Notice());
+
+        IEnumerator Notice()
+        {
+            noticeText.text = text;
+            yield return new WaitForSeconds(1.5f);
+            noticeText.text = "";
+        }
+    }
+
     public void BuyEdgeButton()
     {
         players[currentPlayerTurnIndex].BuyEdge();
@@ -240,7 +263,7 @@ public class MonopolyManager : MonoBehaviour
         isEndGame = true;
 
         // Next turn is the last player
-        NextTurn();
+        PassButton();
         rollButton.gameObject.SetActive(false);
         newGameButton.gameObject.SetActive(true);
 
