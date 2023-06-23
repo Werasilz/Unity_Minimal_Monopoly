@@ -61,6 +61,7 @@ public class Edge
 
         // Subtract player's point
         player.currentPoint -= 1;
+        monopolyManager.UpdatePointGUI();
         if (player.currentPoint < 0) player.currentPoint = 0;
 
         edgePointObject[edgePoint].SetActive(true);

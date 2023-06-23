@@ -106,78 +106,90 @@ public class Player : MonoBehaviour
                 isMoving = false;
             }
 
+            Edge currentEdge = boardManager.edges[currentEdgeIndex];
+
             // If the edge has other player's pawn standing
-            if (boardManager.edges[currentEdgeIndex].isHasPawn)
+            if (currentEdge.isHasPawn)
             {
                 transform.position = new Vector3(transform.position.x + Random.Range(-0.3f, 0.3f), transform.position.y, transform.position.z + Random.Range(-0.3f, 0.3f));
             }
 
             // Set have pawn flag to edge
-            boardManager.edges[currentEdgeIndex].isHasPawn = true;
+            currentEdge.isHasPawn = true;
 
-            EdgeAction();
+            switch (currentEdge.edgeType)
+            {
+                case EdgeType.NormalEdge:
+                    // Edge is have owner
+                    if (currentEdge.edgeColor != ColorEnum.Null && currentEdge.edgeColor != playerColor)
+                    {
+                        // Remove point by edge point
+                        currentPoint -= currentEdge.edgePoint;
+                        monopolyManager.UpdatePointGUI();
+                        print(transform.name + " stand on other player's edge, point -" + currentEdge.edgePoint);
+
+                        // Reset edge to empty edge
+                        currentEdge.Reset(monopolyManager);
+                        CheckWinning();
+                        monopolyManager.ShowBuyEdgeWindow();
+
+                        // Add point to the edge owner
+                        // foreach (Player player in monopolyManager.GetPlayers)
+                        // {
+                        //     // Find player who own this edge by checking on color
+                        //     if (player.playerColor == currentEdge.edgeColor && player.playable)
+                        //     {
+                        //         player.currentPoint += currentEdge.edgePoint;
+                        //         print(player.transform.name + " point +" + currentEdge.edgePoint + " from " + transform.name);
+                        //     }
+                        // }
+                    }
+                    else
+                    {
+                        monopolyManager.ShowBuyEdgeWindow();
+                    }
+                    break;
+                case EdgeType.CornerEdge:
+                    if (currentEdge.edgeColor == playerColor)
+                    {
+                        print(transform.name + " stand on edge corner " + currentEdge.edgeColor.ToString() + ", point +3");
+                        currentPoint += 3;
+                    }
+                    else
+                    {
+                        print(transform.name + " stand on edge corner " + currentEdge.edgeColor.ToString() + ", point +1");
+                        currentPoint += 1;
+                    }
+
+                    // Force pass to next player
+                    monopolyManager.UpdatePointGUI();
+                    monopolyManager.PassButton();
+                    break;
+            }
         }
     }
 
-    private void EdgeAction()
+    public void BuyEdge()
     {
         Edge currentEdge = boardManager.edges[currentEdgeIndex];
 
-        switch (currentEdge.edgeType)
+        if (currentEdge.edgeType == EdgeType.NormalEdge)
         {
-            case EdgeType.NormalEdge:
-                // Edge not have color
-                if (currentEdge.edgeColor == ColorEnum.Null)
-                {
-                    currentEdge.BuyEdge(monopolyManager, this);
-                    print(transform.name + " buy empty edge, point -1");
-                }
-                // Edge have same color as the player
-                else if (currentEdge.edgeColor == playerColor)
-                {
-                    currentEdge.BuyEdge(monopolyManager, this);
-                    print(transform.name + " buy own edge, edge point = " + currentEdge.edgePoint + ", point -1");
-                }
-                // Edge have not same color as the player
-                else
-                {
-                    // Remove point by edge point
-                    currentPoint -= currentEdge.edgePoint;
-                    print(transform.name + " stand on other player's edge, point -" + currentEdge.edgePoint);
+            // Edge not have color
+            if (currentEdge.edgeColor == ColorEnum.Null)
+            {
+                currentEdge.BuyEdge(monopolyManager, this);
+                print(transform.name + " buy empty edge, point -1");
+            }
+            // Edge have same color as the player
+            else if (currentEdge.edgeColor == playerColor)
+            {
+                currentEdge.BuyEdge(monopolyManager, this);
+                print(transform.name + " buy own edge, edge point = " + currentEdge.edgePoint + ", point -1");
+            }
 
-                    // Add point to the edge owner
-                    // foreach (Player player in monopolyManager.GetPlayers)
-                    // {
-                    //     // Find player who own this edge by checking on color
-                    //     if (player.playerColor == currentEdge.edgeColor && player.playable)
-                    //     {
-                    //         player.currentPoint += currentEdge.edgePoint;
-                    //         print(player.transform.name + " point +" + currentEdge.edgePoint + " from " + transform.name);
-                    //     }
-                    // }
-
-                    // Reset edge to empty edge
-                    currentEdge.Reset(monopolyManager);
-                }
-
-                CheckWinning();
-                break;
-            case EdgeType.CornerEdge:
-                if (currentEdge.edgeColor == playerColor)
-                {
-                    print(transform.name + " stand on edge corner " + currentEdge.edgeColor.ToString() + ", point +3");
-                    currentPoint += 3;
-
-                }
-                else
-                {
-                    print(transform.name + " stand on edge corner " + currentEdge.edgeColor.ToString() + ", point +1");
-                    currentPoint += 1;
-                }
-                break;
+            CheckWinning();
         }
-
-        print("==========End Turn===========");
     }
 
     private void CheckWinning()

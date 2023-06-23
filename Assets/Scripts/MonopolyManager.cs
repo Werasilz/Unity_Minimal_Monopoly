@@ -33,6 +33,7 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private Image diceImage;
     [SerializeField] private Button rollButton;
     [SerializeField] private Button newGameButton;
+    [SerializeField] private GameObject buyEdgeWindow;
     [SerializeField] private TextMeshProUGUI playerTurnText;
     [SerializeField] private TextMeshProUGUI diceNumberText;
 
@@ -202,15 +203,35 @@ public class MonopolyManager : MonoBehaviour
             {
                 yield return null;
             }
+        }
+    }
 
-            // Update point text to all player
-            for (int i = 0; i < playerPointText.Length; i++)
-            {
-                playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
-            }
+    public void ShowBuyEdgeWindow()
+    {
+        buyEdgeWindow.SetActive(true);
+    }
 
-            // Game is not end, go to next player's turn
-            if (isEndGame == false) NextTurn();
+    public void BuyEdgeButton()
+    {
+        players[currentPlayerTurnIndex].BuyEdge();
+        PassButton();
+    }
+
+    public void PassButton()
+    {
+        print("==========End Turn==========");
+        buyEdgeWindow.SetActive(false);
+
+        // Game is not end, go to next player's turn
+        if (isEndGame == false) NextTurn();
+    }
+
+    public void UpdatePointGUI()
+    {
+        // Update point text to all player
+        for (int i = 0; i < playerPointText.Length; i++)
+        {
+            playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
         }
     }
 
