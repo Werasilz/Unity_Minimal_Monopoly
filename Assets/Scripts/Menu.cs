@@ -7,14 +7,8 @@ public class Menu : MonoBehaviour
     [SerializeField] private Color32[] colors;
     [SerializeField] private Button[] selectColorButtons;
     [SerializeField] private Image[] selectColorImages;
-    private int[] playerColorIndex;
-    private int playerAmount;
-
-    private void Start()
-    {
-        playerColorIndex = new int[4];
-        playerAmount = 4;
-    }
+    private ColorEnum[] selectedColors = new ColorEnum[4];
+    private int playerAmount = 4;
 
     public void SelectPlayerAmountButton(int playerAmount)
     {
@@ -27,27 +21,20 @@ public class Menu : MonoBehaviour
             selectColorButtons[i].interactable = true;
 
             // More than select player amount
-            if (i >= playerAmount)
-            {
-                // Set button to inactive
-                selectColorButtons[i].interactable = false;
-            }
+            if (i >= playerAmount) selectColorButtons[i].interactable = false;
         }
     }
 
     public void SelectColor(int playerIndex)
     {
         // Next color index
-        playerColorIndex[playerIndex] += 1;
+        selectedColors[playerIndex] += 1;
 
         // Out of color array, reset to first index
-        if (playerColorIndex[playerIndex] > 3)
-        {
-            playerColorIndex[playerIndex] = 0;
-        }
+        if ((int)selectedColors[playerIndex] > 3) selectedColors[playerIndex] = 0;
 
         // Set image to selected color
-        int colorIndex = playerColorIndex[playerIndex];
+        int colorIndex = (int)selectedColors[playerIndex];
         selectColorImages[playerIndex].color = colors[colorIndex];
     }
 
@@ -58,9 +45,10 @@ public class Menu : MonoBehaviour
         {
             for (int j = 0; j < playerAmount; j++)
             {
+                // Skip itself
                 if (i == j) continue;
 
-                if (playerColorIndex[i] == playerColorIndex[j])
+                if (selectedColors[i] == selectedColors[j])
                 {
                     print("[Select Color] Can't play, there're have same color");
                     return;
@@ -69,7 +57,7 @@ public class Menu : MonoBehaviour
         }
 
         // Setup players
-        monopolyManager.SetupPlayer(playerAmount, playerColorIndex);
+        monopolyManager.SetupPlayer(playerAmount, selectedColors);
 
         // Disable menu
         gameObject.SetActive(false);

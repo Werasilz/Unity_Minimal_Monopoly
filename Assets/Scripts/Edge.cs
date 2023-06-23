@@ -8,6 +8,7 @@ public class Edge
     public ColorEnum edgeColor { get; private set; }
     public GameObject edgeObject { get; private set; }
     private List<GameObject> edgePointObject;
+
     public int edgePoint { get; private set; }
     private int maxEdgePoint;
 
@@ -54,12 +55,12 @@ public class Edge
         if (edgeColor == ColorEnum.Null)
         {
             edgeColor = player.playerColor;
-            edgeObject.GetComponent<Renderer>().material = monopolyManager.colorMaterials[(int)player.playerColor];
+            edgeObject.GetComponent<Renderer>().material = monopolyManager.colorMaterials[(int)edgeColor];
         }
 
         player.currentPoint -= 1;
+        edgePointObject[edgePoint].SetActive(true);
         edgePoint += 1;
-        edgePointObject[edgePoint - 1].SetActive(true);
     }
 }
 

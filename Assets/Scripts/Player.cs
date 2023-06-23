@@ -1,24 +1,23 @@
 using UnityEngine;
-using System.Linq;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private MonopolyManager monopolyManager;
+    [SerializeField] private BoardManager boardManager;
 
     [Header("Player Attributes")]
-    [SerializeField] private string playerName;
+    public int currentPoint;
     public bool playable { get; private set; }
     public ColorEnum playerColor { get; private set; }
-    public int currentPoint;
     private int currentEdgeIndex;
 
-    public void Init(int startPoint, int playerIndex, int colorIndex)
+    public void Init(int startPoint, int playerIndex, ColorEnum color)
     {
-        playerColor = (ColorEnum)colorIndex;
+        playerColor = color;
         currentPoint = startPoint;
         playable = true;
-        playerName = playerColor.ToString();
-        currentEdgeIndex = monopolyManager.GetBoard.GetCornerIndex(playerIndex);
+        transform.name = transform.name + "_" + playerColor.ToString();
+        currentEdgeIndex = boardManager.GetCornerIndex(playerIndex);
     }
 
     public void Move(int steps)
@@ -27,15 +26,14 @@ public class Player : MonoBehaviour
         currentEdgeIndex += steps;
 
         // Out of edge array
-        if (currentEdgeIndex >= monopolyManager.GetBoard.edges.Count)
+        if (currentEdgeIndex >= boardManager.edges.Count)
         {
-            int newEdgeIndex = currentEdgeIndex - monopolyManager.GetBoard.edges.Count;
-            currentEdgeIndex = newEdgeIndex;
+            currentEdgeIndex = currentEdgeIndex - boardManager.edges.Count;
         }
 
         // Set pawn position
-        print(playerName + " move to edge " + currentEdgeIndex);
-        Vector3 targetPosition = monopolyManager.GetBoard.edges[currentEdgeIndex].edgeObject.transform.position + Vector3.up;
+        print(transform.name + " move to edge " + currentEdgeIndex);
+        Vector3 targetPosition = boardManager.edges[currentEdgeIndex].edgeObject.transform.position;
         transform.position = targetPosition;
 
         EdgeAction();
@@ -43,7 +41,7 @@ public class Player : MonoBehaviour
 
     private void EdgeAction()
     {
-        Edge currentEdge = monopolyManager.GetBoard.edges[currentEdgeIndex];
+        Edge currentEdge = boardManager.edges[currentEdgeIndex];
 
         switch (currentEdge.edgeType)
         {
@@ -52,55 +50,54 @@ public class Player : MonoBehaviour
                 if (currentEdge.edgeColor == ColorEnum.Null)
                 {
                     currentEdge.BuyEdge(monopolyManager, this);
-
-                    CheckWinning();
-                    print(playerName + " buy empty edge, point -1");
+                    print(transform.name + " buy empty edge, point -1");
                 }
                 // Edge have same color as the player
                 else if (currentEdge.edgeColor == playerColor)
                 {
                     currentEdge.BuyEdge(monopolyManager, this);
-
-                    CheckWinning();
-                    print(playerName + " buy edge, point -1");
+                    print(transform.name + " buy own edge, edge point = " + currentEdge.edgePoint + ", point -1");
                 }
                 // Edge have not same color as the player
                 else
                 {
                     // Remove point by edge point
                     currentPoint -= currentEdge.edgePoint;
-                    print(playerName + " stand on other player's edge, point -" + currentEdge.edgePoint);
+                    print(transform.name + " stand on other player's edge, point -" + currentEdge.edgePoint);
 
-                    // Add point to edge owner
+                    // Add point to the edge owner
                     foreach (Player player in monopolyManager.GetPlayers)
                     {
+                        // Find player who own this edge by checking on color
                         if (player.playerColor == currentEdge.edgeColor && player.playable)
                         {
                             player.currentPoint += currentEdge.edgePoint;
-                            print(player.playerName + " point +" + currentEdge.edgePoint + " from " + this.playerName);
+                            print(player.transform.name + " point +" + currentEdge.edgePoint + " from " + transform.name);
                         }
                     }
 
+                    // Reset edge to empty edge
                     currentEdge.Reset(monopolyManager);
-                    CheckWinning();
                 }
+
+                CheckWinning();
                 break;
             case EdgeType.CornerEdge:
                 if (currentEdge.edgeColor == playerColor)
                 {
-                    print(playerName + " stand on edge corner same color as the player, point +3");
+                    print(transform.name + " stand on edge corner " + currentEdge.edgeColor.ToString() + ", point +3");
                     currentPoint += 3;
 
                 }
                 else
                 {
-                    print(playerName + " stand on edge corner not same color as the player, point +1");
+                    print(transform.name + " stand on edge corner " + currentEdge.edgeColor.ToString() + ", point +1");
                     currentPoint += 1;
                 }
                 break;
         }
 
-        print("===========End Turn===========");
+        print("==========End Turn===========");
     }
 
     private void CheckWinning()
@@ -108,10 +105,10 @@ public class Player : MonoBehaviour
         // Check for lose
         if (currentPoint <= 0)
         {
-            print(playerName + " Game Over");
             gameObject.SetActive(false);
             playable = false;
             monopolyManager.playerLose.Add(this);
+            print(transform.name + " Game Over");
 
             // Check player in game
             if (monopolyManager.playerLose.Count == monopolyManager.playerAmount - 1)

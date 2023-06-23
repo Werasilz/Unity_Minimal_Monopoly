@@ -1,16 +1,15 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class Board
+public class BoardManager : MonoBehaviour
 {
     [SerializeField] private MonopolyManager monopolyManager;
 
     [Header("Edge Settings")]
     [SerializeField] private int edgePerRow = 6;
     [SerializeField] private int maxEdgePoint = 3;
-    [SerializeField] private GameObject edgePrefab;
-    [SerializeField] private GameObject edgeCornerPrefab;
+    [SerializeField] private GameObject normalEdgePrefab;
+    [SerializeField] private GameObject cornerEdgePrefab;
     public List<Edge> edges { get; private set; }
 
     public void Init()
@@ -46,7 +45,7 @@ public class Board
                 // Set edge block color (corner) 
                 if (j == 0)
                 {
-                    newEdgeObject = Object.Instantiate(edgeCornerPrefab, Vector3.zero, Quaternion.identity);
+                    newEdgeObject = Object.Instantiate(cornerEdgePrefab, Vector3.zero, Quaternion.identity);
                     newEdgeObject.name = string.Format("Row ({0}) | Edge ({1}) | Corner", i, j);
 
                     int colorIndex = (int)monopolyManager.GetPlayers[0].playerColor;
@@ -57,7 +56,7 @@ public class Board
                 }
                 else if (j == edgePerRow - 1 && i < monopolyManager.playerAmount - 1)
                 {
-                    newEdgeObject = Object.Instantiate(edgeCornerPrefab, Vector3.zero, Quaternion.identity);
+                    newEdgeObject = Object.Instantiate(cornerEdgePrefab, Vector3.zero, Quaternion.identity);
                     newEdgeObject.name = string.Format("Row ({0}) | Edge ({1}) | Corner", i, j);
 
                     int colorIndex = (int)monopolyManager.GetPlayers[i + 1].playerColor;
@@ -67,7 +66,7 @@ public class Board
                 }
                 else
                 {
-                    newEdgeObject = Object.Instantiate(edgePrefab, Vector3.zero, Quaternion.identity);
+                    newEdgeObject = Object.Instantiate(normalEdgePrefab, Vector3.zero, Quaternion.identity);
                     newEdgeObject.name = string.Format("Row ({0}) | Edge ({1})", i, j);
 
                     newEdge.SetType(EdgeType.NormalEdge, ColorEnum.Null);

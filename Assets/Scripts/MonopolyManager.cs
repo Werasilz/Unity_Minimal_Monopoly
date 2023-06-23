@@ -6,25 +6,26 @@ using TMPro;
 
 public class MonopolyManager : MonoBehaviour
 {
-    [Header("Game System")]
-    [SerializeField] private Board board;
-    public Board GetBoard => board;
-    public bool isEndGame { get; private set; }
+    [SerializeField] private BoardManager boardManager;
 
-    [Header("Dice")]
+    [Header("Game Status")]
+    [SerializeField] private bool isEndGame = false;
+    public int playerAmount { get; private set; }
+
+    [Header("Dice Settings")]
     [SerializeField] private int diceFacesAmount = 6;
 
     [Header("Colors")]
     public Material defaultColorMaterial;
     public Material[] colorMaterials;
+    public Color32[] colors;
 
     [Header("Players")]
     [SerializeField] private int startPoint = 9;
     [SerializeField] private GameObject pawnPrefab;
-    [SerializeField] private int currentPlayerTurnIndex;
     [SerializeField] private Player[] players;
     public Player[] GetPlayers => players;
-    public int playerAmount { get; private set; }
+    private int currentPlayerTurnIndex;
     public List<Player> playerLose;
 
     [Header("User Interface")]
@@ -38,7 +39,7 @@ public class MonopolyManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] playerPointStatusText;
     [SerializeField] private Image[] playerRanking;
 
-    public void SetupPlayer(int playerAmount, int[] playerColorIndex)
+    public void SetupPlayer(int playerAmount, ColorEnum[] selectedColors)
     {
         // Set player amount
         this.playerAmount = playerAmount;
@@ -47,44 +48,91 @@ public class MonopolyManager : MonoBehaviour
         // Disable player
         for (int i = 0; i < players.Length; i++)
         {
-            if (i >= playerAmount)
-            {
-                players[i].gameObject.SetActive(false);
-            }
+            if (i >= playerAmount) players[i].gameObject.SetActive(false);
         }
 
         // Set player color
         for (int i = 0; i < playerAmount; i++)
         {
-            players[i].Init(startPoint, i, playerColorIndex[i]);
+            players[i].Init(startPoint, i, selectedColors[i]);
         }
 
         // Setup board
-        board.Init();
+        boardManager.Init();
 
         // Spawn player pawn
-        int playerSpawned = 0;
+        int playerSpawnedCount = 0;
 
-        for (int i = 0; i < board.edges.Count; i++)
+        // loop through all edges
+        for (int i = 0; i < boardManager.edges.Count; i++)
         {
-            if (board.edges[i].edgeType == EdgeType.CornerEdge)
+            // Spawn at corner edge
+            if (boardManager.edges[i].edgeType == EdgeType.CornerEdge)
             {
                 // Spawn pawn object
-                GameObject newPawn = Instantiate(pawnPrefab, board.edges[i].edgeObject.transform.position + Vector3.up, Quaternion.identity);
+                GameObject newPawn = Instantiate(pawnPrefab, players[playerSpawnedCount].transform);
+                players[playerSpawnedCount].transform.position = boardManager.edges[i].edgeObject.transform.position;
+                newPawn.transform.name = "Pawn_" + players[playerSpawnedCount].playerColor.ToString();
 
-                // Set parent
-                players[playerSpawned].transform.position = newPawn.transform.position;
-                newPawn.transform.SetParent(players[playerSpawned].transform);
-
-                // Set color
-                int colorIndex = (int)players[playerSpawned].playerColor;
+                // Set pawn color
+                int colorIndex = (int)players[playerSpawnedCount].playerColor;
                 newPawn.GetComponentInChildren<Renderer>().material = colorMaterials[colorIndex];
-                playerSpawned += 1;
+
+                // Count the spawned player
+                playerSpawnedCount += 1;
             }
         }
 
-        // Pick first player to play
-        StartCoroutine(PickFirstPlayer());
+        PickFirstPlayer();
+    }
+
+    private void PickFirstPlayer()
+    {
+        // Show color picking ui
+        colorPicking.gameObject.SetActive(true);
+
+        // Enable player ui
+        for (int i = 0; i < playerAmount; i++)
+        {
+            playerHUD[i].gameObject.SetActive(true);
+            playerHUD[i].color = colors[(int)players[i].playerColor];
+            playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
+        }
+
+
+        // Random first player to play
+        StartCoroutine(RandomPlayer());
+
+        IEnumerator RandomPlayer()
+        {
+            int lastRandom = 0;
+
+            for (int i = 0; i < 20; i++)
+            {
+                // Random player
+                int newRandom = Random.Range(0, playerAmount);
+                if (newRandom == lastRandom) continue;
+                lastRandom = newRandom;
+
+                // Set color
+                colorPicking.color = colors[(int)players[newRandom].playerColor];
+
+                // Delay the random
+                float delay = 0.15f + (i / 100);
+                yield return new WaitForSeconds(delay);
+            }
+
+            // Set first player to play
+            currentPlayerTurnIndex = lastRandom;
+            playerTurnText.text = players[currentPlayerTurnIndex].transform.name + "'s turn";
+            print(playerTurnText.text);
+
+            yield return new WaitForSeconds(1f);
+
+            // Setup ui
+            colorPicking.gameObject.SetActive(false);
+            rollButton.gameObject.SetActive(true);
+        }
     }
 
     private void NextTurn()
@@ -96,16 +144,13 @@ public class MonopolyManager : MonoBehaviour
         currentPlayerTurnIndex += 1;
 
         // Back to first player index
-        if (currentPlayerTurnIndex > playerAmount - 1)
-        {
-            currentPlayerTurnIndex = 0;
-        }
+        if (currentPlayerTurnIndex > playerAmount - 1) currentPlayerTurnIndex = 0;
 
         // Player still can play
         if (players[currentPlayerTurnIndex].playable)
         {
-            playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
-            print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
+            playerTurnText.text = players[currentPlayerTurnIndex].transform.name + "'s turn";
+            print(playerTurnText.text);
         }
         // Skip lose player
         else
@@ -120,6 +165,7 @@ public class MonopolyManager : MonoBehaviour
 
         IEnumerator Roll()
         {
+            // Hide roll button, show dice image
             rollButton.gameObject.SetActive(false);
             diceImage.gameObject.SetActive(true);
             int lastNumber = 0;
@@ -129,100 +175,44 @@ public class MonopolyManager : MonoBehaviour
                 // Roll a dice
                 int newNumber = Random.Range(1, diceFacesAmount + 1);
                 if (newNumber == lastNumber) continue;
+                lastNumber = newNumber;
 
                 // Set number text
                 diceNumberText.text = newNumber.ToString();
-
-                // Set last number
-                lastNumber = newNumber;
 
                 // Delay the random
                 float delay = 0.15f + (i / 100);
                 yield return new WaitForSeconds(delay);
             }
 
-            print(players[currentPlayerTurnIndex].playerColor.ToString() + " dice = " + lastNumber);
+            print(players[currentPlayerTurnIndex].transform.name + " dice = " + lastNumber);
             yield return new WaitForSeconds(1f);
+
+            // Finished roll a dice
             diceImage.gameObject.SetActive(false);
 
             // Move the pawn
             players[currentPlayerTurnIndex].Move(lastNumber);
 
-            // Update point text
+            // Update point text to all player
             for (int i = 0; i < playerPointText.Length; i++)
             {
                 playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
             }
 
-            if (isEndGame == false)
-            {
-                // Next player's turn
-                NextTurn();
-
-                // Enable roll button for next player
-                rollButton.gameObject.SetActive(true);
-            }
+            // Game is not end, go to next player's turn
+            if (isEndGame == false) NextTurn();
         }
-    }
-
-    private IEnumerator PickFirstPlayer()
-    {
-        // Show color picking ui
-        colorPicking.gameObject.SetActive(true);
-
-        // Disable player ui
-        for (int i = 0; i < 4; i++)
-        {
-            playerHUD[i].color = colorMaterials[(int)players[i].playerColor].color;
-
-            if (i < playerAmount)
-            {
-                playerHUD[i].gameObject.SetActive(true);
-                playerPointText[i].text = "Point:" + players[i].currentPoint.ToString();
-            }
-            else
-            {
-                playerHUD[i].gameObject.SetActive(false);
-            }
-        }
-
-        // Random first player
-        int lastRandom = 0;
-
-        for (int i = 0; i < 20; i++)
-        {
-            // Random player
-            int newRandom = Random.Range(0, playerAmount);
-            if (newRandom == lastRandom) continue;
-
-            // Set color
-            colorPicking.color = colorMaterials[(int)players[newRandom].playerColor].color;
-
-            // Set last random
-            lastRandom = newRandom;
-
-            // Delay the random
-            float delay = 0.15f + (i / 100);
-            yield return new WaitForSeconds(delay);
-        }
-
-        // Set first player to play
-        currentPlayerTurnIndex = lastRandom;
-        playerTurnText.text = "Player " + players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn";
-        print(players[currentPlayerTurnIndex].playerColor.ToString() + "'s turn");
-
-        yield return new WaitForSeconds(1f);
-
-        // Setup ui
-        colorPicking.gameObject.SetActive(false);
-        rollButton.gameObject.SetActive(true);
     }
 
     public void Summary()
     {
         isEndGame = true;
+
+        // Next turn is the last player
         NextTurn();
 
+        // Show ranking window
         for (int i = 0; i < playerRanking.Length; i++)
         {
             playerRanking[i].gameObject.SetActive(true);
@@ -230,11 +220,11 @@ public class MonopolyManager : MonoBehaviour
             if (i < playerRanking.Length - 1)
             {
                 playerRanking[i].GetComponentInChildren<TextMeshProUGUI>().text = "Lose";
-                playerRanking[i].color = colorMaterials[(int)playerLose[i].playerColor].color;
+                playerRanking[i].color = colors[(int)playerLose[i].playerColor];
             }
             else
             {
-                playerRanking[i].color = colorMaterials[(int)players[currentPlayerTurnIndex].playerColor].color;
+                playerRanking[i].color = colors[(int)players[currentPlayerTurnIndex].playerColor];
             }
         }
     }

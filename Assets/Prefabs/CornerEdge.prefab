@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4020228918346307142}
   - component: {fileID: 7346981994816217692}
   m_Layer: 0
-  m_Name: EdgeCorner
+  m_Name: CornerEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
