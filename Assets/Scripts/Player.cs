@@ -22,6 +22,9 @@ public class Player : MonoBehaviour
 
     public void Move(int steps)
     {
+        // Set not have pawn flag to edge
+        boardManager.edges[currentEdgeIndex].isHasPawn = false;
+
         // Next edge index
         currentEdgeIndex += steps;
 
@@ -35,6 +38,15 @@ public class Player : MonoBehaviour
         print(transform.name + " move to edge " + currentEdgeIndex);
         Vector3 targetPosition = boardManager.edges[currentEdgeIndex].edgeObject.transform.position;
         transform.position = targetPosition;
+
+        // If the edge has other player's pawn standing
+        if (boardManager.edges[currentEdgeIndex].isHasPawn)
+        {
+            transform.position = new Vector3(transform.position.x + Random.Range(-0.3f, 0.3f), transform.position.y, transform.position.z + Random.Range(-0.3f, 0.3f));
+        }
+
+        // Set have pawn flag to edge
+        boardManager.edges[currentEdgeIndex].isHasPawn = true;
 
         EdgeAction();
     }

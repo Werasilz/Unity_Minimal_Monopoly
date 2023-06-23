@@ -9,6 +9,7 @@ public class Edge
     public GameObject edgeObject { get; private set; }
     private List<GameObject> edgePointObject;
 
+    public bool isHasPawn;
     public int edgePoint { get; private set; }
     private int maxEdgePoint;
 
@@ -58,7 +59,10 @@ public class Edge
             edgeObject.GetComponent<Renderer>().material = monopolyManager.colorMaterials[(int)edgeColor];
         }
 
+        // Subtract player's point
         player.currentPoint -= 1;
+        if (player.currentPoint < 0) player.currentPoint = 0;
+
         edgePointObject[edgePoint].SetActive(true);
         edgePoint += 1;
     }
