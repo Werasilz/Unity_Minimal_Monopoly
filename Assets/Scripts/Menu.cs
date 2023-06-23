@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
@@ -61,5 +62,10 @@ public class Menu : MonoBehaviour
 
         // Disable menu
         gameObject.SetActive(false);
+    }
+
+    public void NewGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

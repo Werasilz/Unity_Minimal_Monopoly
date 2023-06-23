@@ -30,13 +30,16 @@ public class MonopolyManager : MonoBehaviour
 
     [Header("User Interface")]
     [SerializeField] private Image colorPicking;
-    [SerializeField] private Button rollButton;
     [SerializeField] private Image diceImage;
+    [SerializeField] private Button rollButton;
+    [SerializeField] private Button newGameButton;
     [SerializeField] private TextMeshProUGUI playerTurnText;
     [SerializeField] private TextMeshProUGUI diceNumberText;
+
     [SerializeField] private Image[] playerHUD;
     [SerializeField] private TextMeshProUGUI[] playerPointText;
     [SerializeField] private TextMeshProUGUI[] playerPointStatusText;
+    [SerializeField] private TextMeshProUGUI[] rankingText;
     [SerializeField] private Image[] playerRanking;
 
     public void SetupPlayer(int playerAmount, ColorEnum[] selectedColors)
@@ -211,20 +214,42 @@ public class MonopolyManager : MonoBehaviour
 
         // Next turn is the last player
         NextTurn();
+        rollButton.gameObject.SetActive(false);
+        newGameButton.gameObject.SetActive(true);
 
         // Show ranking window
-        for (int i = 0; i < playerRanking.Length; i++)
+        for (int i = 0; i < playerAmount; i++)
         {
             playerRanking[i].gameObject.SetActive(true);
 
-            if (i < playerRanking.Length - 1)
+            if (i < playerAmount - 1)
             {
                 playerRanking[i].GetComponentInChildren<TextMeshProUGUI>().text = "Lose";
                 playerRanking[i].color = colors[(int)playerLose[i].playerColor];
+                print(i + " " + (playerAmount - 1));
+
+                if (playerAmount == 2)
+                {
+                    rankingText[playerAmount + 1].text = "2nd";
+                }
+                else if (playerAmount == 3)
+                {
+                    rankingText[playerAmount - 1].text = "2nd";
+                    rankingText[playerAmount].text = "3rd";
+                }
             }
             else
             {
                 playerRanking[i].color = colors[(int)players[currentPlayerTurnIndex].playerColor];
+
+                if (playerAmount == 2)
+                {
+                    rankingText[i + 1].text = "1st";
+                }
+                else if (playerAmount == 3)
+                {
+                    rankingText[i - 1].text = "1st";
+                }
             }
         }
     }
