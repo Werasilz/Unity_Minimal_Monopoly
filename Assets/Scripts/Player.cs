@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class Player : MonoBehaviour
 
     [Header("Player Attributes")]
     public int currentPoint;
+    public bool isMoving { get; private set; }
     public bool playable { get; private set; }
     public ColorEnum playerColor { get; private set; }
     private int currentEdgeIndex;
@@ -22,33 +24,99 @@ public class Player : MonoBehaviour
 
     public void Move(int steps)
     {
-        // Set not have pawn flag to edge
-        boardManager.edges[currentEdgeIndex].isHasPawn = false;
+        StartCoroutine(MoveSteps(steps, 0.15f));
 
-        // Next edge index
-        currentEdgeIndex += steps;
-
-        // Out of edge array
-        if (currentEdgeIndex >= boardManager.edges.Count)
+        IEnumerator MoveSteps(int steps, float moveDelay)
         {
-            currentEdgeIndex = currentEdgeIndex - boardManager.edges.Count;
+            // Set not have pawn flag to edge
+            boardManager.edges[currentEdgeIndex].isHasPawn = false;
+
+            // Store temp index
+            int tempEdgeIndex = currentEdgeIndex;
+
+            // Next edge index
+            currentEdgeIndex += steps;
+
+            // Out of edge array
+            if (currentEdgeIndex >= boardManager.edges.Count)
+            {
+                currentEdgeIndex = currentEdgeIndex - boardManager.edges.Count;
+
+                // If out of edge array
+                // move to the last of edges (For now is index 19)
+                // then move to edge index 0 and continue move by currentEdgeIndex
+
+                print(transform.name + " move to edge " + currentEdgeIndex + " from " + tempEdgeIndex);
+
+                // Start moving
+                isMoving = true;
+                Vector3 targetPosition = Vector3.zero;
+
+                while (tempEdgeIndex <= boardManager.edges.Count - 1)
+                {
+                    // Move to next edge
+                    targetPosition = boardManager.edges[tempEdgeIndex].edgeObject.transform.position;
+                    transform.position = targetPosition;
+                    yield return new WaitForSeconds(moveDelay);
+
+                    // Next edge
+                    tempEdgeIndex += 1;
+                }
+
+                // Move to next edge
+                targetPosition = boardManager.edges[0].edgeObject.transform.position;
+                transform.position = targetPosition;
+                tempEdgeIndex = 0;
+                yield return new WaitForSeconds(moveDelay);
+
+                while (tempEdgeIndex <= currentEdgeIndex)
+                {
+                    // Move to next edge
+                    targetPosition = boardManager.edges[tempEdgeIndex].edgeObject.transform.position;
+                    transform.position = targetPosition;
+                    yield return new WaitForSeconds(moveDelay);
+
+                    // Next edge
+                    tempEdgeIndex += 1;
+                }
+
+                // Finished moving
+                isMoving = false;
+            }
+            else
+            {
+                print(transform.name + " move to edge " + currentEdgeIndex + " from " + tempEdgeIndex);
+
+                // Start moving
+                isMoving = true;
+
+                while (tempEdgeIndex <= currentEdgeIndex)
+                {
+                    // Move to next edge
+                    Vector3 targetPosition = boardManager.edges[tempEdgeIndex].edgeObject.transform.position;
+                    transform.position = targetPosition;
+
+                    yield return new WaitForSeconds(moveDelay);
+
+                    // Next edge
+                    tempEdgeIndex += 1;
+                }
+
+                // Finished moving
+                isMoving = false;
+            }
+
+            // If the edge has other player's pawn standing
+            if (boardManager.edges[currentEdgeIndex].isHasPawn)
+            {
+                transform.position = new Vector3(transform.position.x + Random.Range(-0.3f, 0.3f), transform.position.y, transform.position.z + Random.Range(-0.3f, 0.3f));
+            }
+
+            // Set have pawn flag to edge
+            boardManager.edges[currentEdgeIndex].isHasPawn = true;
+
+            EdgeAction();
         }
-
-        // Set pawn position
-        print(transform.name + " move to edge " + currentEdgeIndex);
-        Vector3 targetPosition = boardManager.edges[currentEdgeIndex].edgeObject.transform.position;
-        transform.position = targetPosition;
-
-        // If the edge has other player's pawn standing
-        if (boardManager.edges[currentEdgeIndex].isHasPawn)
-        {
-            transform.position = new Vector3(transform.position.x + Random.Range(-0.3f, 0.3f), transform.position.y, transform.position.z + Random.Range(-0.3f, 0.3f));
-        }
-
-        // Set have pawn flag to edge
-        boardManager.edges[currentEdgeIndex].isHasPawn = true;
-
-        EdgeAction();
     }
 
     private void EdgeAction()
@@ -78,15 +146,15 @@ public class Player : MonoBehaviour
                     print(transform.name + " stand on other player's edge, point -" + currentEdge.edgePoint);
 
                     // Add point to the edge owner
-                    foreach (Player player in monopolyManager.GetPlayers)
-                    {
-                        // Find player who own this edge by checking on color
-                        if (player.playerColor == currentEdge.edgeColor && player.playable)
-                        {
-                            player.currentPoint += currentEdge.edgePoint;
-                            print(player.transform.name + " point +" + currentEdge.edgePoint + " from " + transform.name);
-                        }
-                    }
+                    // foreach (Player player in monopolyManager.GetPlayers)
+                    // {
+                    //     // Find player who own this edge by checking on color
+                    //     if (player.playerColor == currentEdge.edgeColor && player.playable)
+                    //     {
+                    //         player.currentPoint += currentEdge.edgePoint;
+                    //         print(player.transform.name + " point +" + currentEdge.edgePoint + " from " + transform.name);
+                    //     }
+                    // }
 
                     // Reset edge to empty edge
                     currentEdge.Reset(monopolyManager);

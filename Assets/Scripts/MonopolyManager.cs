@@ -197,6 +197,12 @@ public class MonopolyManager : MonoBehaviour
             // Move the pawn
             players[currentPlayerTurnIndex].Move(lastNumber);
 
+            // Wait until finished move
+            while (players[currentPlayerTurnIndex].isMoving)
+            {
+                yield return null;
+            }
+
             // Update point text to all player
             for (int i = 0; i < playerPointText.Length; i++)
             {
@@ -226,7 +232,6 @@ public class MonopolyManager : MonoBehaviour
             {
                 playerRanking[i].GetComponentInChildren<TextMeshProUGUI>().text = "Lose";
                 playerRanking[i].color = colors[(int)playerLose[i].playerColor];
-                print(i + " " + (playerAmount - 1));
 
                 if (playerAmount == 2)
                 {
